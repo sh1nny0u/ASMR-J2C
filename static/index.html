@@ -1,0 +1,160 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ASMR-J2C</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <h1>ASMR-J2C</h1>
+            <p>项目简介<span id="appVersion"></span></p>
+          </div>
+          <div class="status-pill" id="serviceStatus">待上传</div>
+        </header>
+
+        <section class="intro-panel">
+          <strong>本地日转中音频替换工具</strong>
+          <p>
+            上传原音频、中文 LRC 和目标音色参考音频后，程序按字幕时间逐句调用 IndexTTS2 生成中文语音，
+            只替换字幕标记的说话片段，字幕外的环境声、停顿和背景音保持原样。
+          </p>
+        </section>
+
+        <form id="jobForm" class="upload-grid">
+          <label class="drop">
+            <span>日语原音频</span>
+            <input required type="file" name="original_audio" accept="audio/*,.wav,.mp3,.m4a,.flac,.aac" />
+          </label>
+          <label class="drop">
+            <span>中文 LRC</span>
+            <input required type="file" name="lrc_file" accept=".lrc,.txt" />
+          </label>
+          <label class="drop">
+            <span>目标音色参考音频</span>
+            <input required type="file" name="reference_audio" accept="audio/*,.wav,.mp3,.m4a,.flac,.aac" />
+          </label>
+
+          <div class="controls">
+            <label class="select-label">
+              输出格式
+              <select name="output_format">
+                <option value="wav">WAV</option>
+                <option value="mp3">MP3</option>
+              </select>
+            </label>
+            <label class="check-label option-check">
+              <input type="checkbox" id="autoPlayWhenDone" checked />
+              完成后自动载入试听
+            </label>
+            <button type="submit" id="startButton">开始生成</button>
+            <button type="button" id="pauseButton" disabled>暂停</button>
+            <button type="button" id="resumeButton" disabled>继续</button>
+            <button type="button" id="cancelButton" disabled>取消</button>
+          </div>
+
+          <details class="settings-panel">
+            <summary>IndexTTS2 参数</summary>
+            <p class="panel-note">
+              情感描述模式适合输入“轻声、温柔、低语”等自然语言；向量模式至少设置一个情感值。
+              temperature 越高变化越大，top_p/top_k 越低越保守。
+            </p>
+            <div class="settings-grid">
+              <label>
+                调用方式
+                <select name="api_mode">
+                  <option value="queue">UI 队列 API（推荐）</option>
+                  <option value="direct">直接 TTS API</option>
+                </select>
+              </label>
+              <label>
+                情感控制方式
+                <select name="emo_control">
+                  <option value="与音色参考音频相同">与音色参考音频相同</option>
+                  <option value="使用情感描述文本控制">使用情感描述文本控制</option>
+                  <option value="使用情感向量控制">使用情感向量控制</option>
+                </select>
+              </label>
+              <label class="check-label">
+                <input type="checkbox" name="emo_random" value="true" />
+                情感随机采样
+              </label>
+              <label class="wide">
+                情感描述文本
+                <input type="text" name="emo_text" placeholder="例如：高兴、愤怒、悲伤等" />
+              </label>
+              <label>情感权重 <input type="number" name="emo_weight" value="0.8" min="0" max="1.6" step="0.1" /></label>
+
+              <label>喜 <input type="number" name="emo_vec_1" value="0" min="0" max="1.4" step="0.1" /></label>
+              <label>怒 <input type="number" name="emo_vec_2" value="0" min="0" max="1.4" step="0.1" /></label>
+              <label>哀 <input type="number" name="emo_vec_3" value="0" min="0" max="1.4" step="0.1" /></label>
+              <label>惧 <input type="number" name="emo_vec_4" value="0" min="0" max="1.4" step="0.1" /></label>
+              <label>厌恶 <input type="number" name="emo_vec_5" value="0" min="0" max="1.4" step="0.1" /></label>
+              <label>低落 <input type="number" name="emo_vec_6" value="0" min="0" max="1.4" step="0.1" /></label>
+              <label>惊喜 <input type="number" name="emo_vec_7" value="0" min="0" max="1.4" step="0.1" /></label>
+              <label>平静 <input type="number" name="emo_vec_8" value="0" min="0" max="1.4" step="0.1" /></label>
+
+              <label>temperature <input type="number" name="temperature" value="0.8" min="0.1" max="2" step="0.1" /></label>
+              <label>top_p <input type="number" name="top_p" value="0.8" min="0" max="1" step="0.05" /></label>
+              <label>top_k <input type="number" name="top_k" value="30" min="0" max="100" step="1" /></label>
+              <label class="check-label">
+                <input type="checkbox" name="do_sample" value="true" checked />
+                do_sample
+              </label>
+              <label>num_beams <input type="number" name="num_beams" value="3" min="1" max="10" step="1" /></label>
+              <label>repetition_penalty <input type="number" name="repetition_penalty" value="10" min="0" max="20" step="0.5" /></label>
+              <label>length_penalty <input type="number" name="length_penalty" value="0" min="-10" max="10" step="0.1" /></label>
+              <label>max_mel_tokens <input type="number" name="max_mel_tokens" value="1500" min="50" max="1815" step="25" /></label>
+              <label>
+                最大分句 Token
+                <input type="number" name="max_text_tokens_per_segment" value="120" min="20" max="600" step="10" />
+              </label>
+              
+  <!-- TTS 服务地址配置 -->
+  <div class="wide" style="grid-column: 1/-1; margin-top: 12px; padding-top: 12px; border-top: 1px solid #ddd;">
+    <label style="font-weight: 600;">IndexTTS2 服务地址</label>
+    <div style="display: flex; gap: 8px; margin-top: 6px;">
+      <input type="text" name="tts_url" id="ttsUrl" placeholder="http://127.0.0.1:7860" style="flex: 1;" />
+      <button type="button" id="testTtsUrl">测试连接</button>
+    </div>
+  </div></div>
+          </details>
+        </form>
+
+        <section class="progress-panel">
+          <div class="progress-head">
+            <strong id="stageText">等待任务</strong>
+            <span id="countText">0 / 0</span>
+          </div>
+          <progress id="progressBar" value="0" max="1"></progress>
+          <p id="currentText" class="current-text"></p>
+          <p id="errorText" class="error-text"></p>
+          <div class="actions">
+            <a id="downloadLink" class="download" hidden>下载输出音频</a>
+            <audio id="player" controls hidden></audio>
+          </div>
+        </section>
+
+        <section class="details">
+          <div>
+            <h2>字幕解析</h2>
+            <div id="preview" class="preview empty">任务开始后显示字幕行。</div>
+          </div>
+          <div>
+            <h2>提示</h2>
+            <ul id="warnings" class="warnings">
+              <li>暂停会在当前句生成完成后生效，不会强行打断 IndexTTS2。</li>
+              <li>如果页面没有显示版本号，请先运行 stop.bat 再重新启动。</li>
+              <li>每次任务的实际 TTS 参数会写入 runtime.log。</li>
+            </ul>
+          </div>
+        </section>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
