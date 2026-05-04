@@ -10,11 +10,14 @@
 - 替换字幕有效时间段内的原声，字幕外的环境声、停顿和背景音保持原样。
 - 对生成语音做响度平衡和时长适配，输出完整 WAV/MP3 音频。
 
+## 截图
+![ASMR-J2C 运行界面截图](./img/img.png)
+
 ## 依赖
 
 - **Python 3.11+**
 - **ffmpeg**（需加入系统 PATH）
-- **IndexTTS2** 服务（另行启动）
+- **IndexTTS2** 服务（本项目需要配合 [IndexTTS2](https://github.com/index-tts/index-tts) 服务使用。）
 
 ## 快速开始
 
