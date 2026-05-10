@@ -1,19 +1,6 @@
 @echo off
-setlocal
-
-cd /d "%~dp0"
-
-set PORT=7861
-
-echo Stopping ASMR-J2C server on port %PORT%...
-
-for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":%PORT%" ^| findstr "LISTENING"') do set PID=%%a
-if defined PID (
-    echo Killing process %PID%
-    taskkill /PID %PID% /F >nul 2>&1
-    echo Done.
-) else (
-    echo No process found listening on port %PORT%.
-)
-
+echo Stopping IndexTTS2 and ASMR-J2C...
+echo Killing processes on ports 7860 and 7861...
+powershell -Command "Get-NetTCPConnection -LocalPort 7860,7861 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue; Write-Host ('Killed process ' + $_.OwningProcess + ' using port ' + $_.LocalPort) }"
+echo Done.
 pause

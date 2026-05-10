@@ -342,3 +342,32 @@
 
     loadHealth();
 })();
+    // TTS 健康检查
+    const ttsStatusSpan = document.querySelector('#tts-status');
+    const startBtn = document.querySelector('#startButton');
+
+    async function checkTTSHealth() {
+        if (!ttsStatusSpan) return;
+        try {
+            const resp = await fetch('/tts/health');
+            const data = await resp.json();
+            if (data.status === 'ok') {
+                ttsStatusSpan.textContent = '● TTS 就绪';
+                ttsStatusSpan.style.color = 'green';
+                if (startBtn) startBtn.disabled = false;
+            } else {
+                ttsStatusSpan.textContent = '● TTS 未启动';
+                ttsStatusSpan.style.color = 'red';
+                if (startBtn) startBtn.disabled = true;
+            }
+        } catch {
+            ttsStatusSpan.textContent = '● TTS 连接失败';
+            ttsStatusSpan.style.color = 'red';
+            if (startBtn) startBtn.disabled = true;
+        }
+    }
+
+    // 初始检查
+    checkTTSHealth();
+    // 每 15 秒轮询一次
+    setInterval(checkTTSHealth, 15000);

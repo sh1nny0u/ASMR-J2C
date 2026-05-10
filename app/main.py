@@ -1,5 +1,6 @@
 ﻿from __future__ import annotations
 
+from app.routes import router
 import logging
 from pathlib import Path
 
@@ -10,7 +11,6 @@ from fastapi.staticfiles import StaticFiles
 from app.config import APP_VERSION, RUN_LOG_PATH, STATIC_DIR
 from app.jobs import store
 from app.tts import TTSOptions
-
 
 logging.basicConfig(
     level=logging.INFO,
@@ -34,7 +34,7 @@ async def create_job(
     lrc_file: UploadFile = File(...),
     reference_audio: UploadFile = File(...),
     output_format: str = Form("wav"),
-    api_mode: str = Form("queue"),
+    api_mode: str = Form("direct"),
     emo_control: str = Form("与音色参考音频相同"),
     emo_text: str = Form(""),
     emo_weight: float = Form(0.8),
@@ -175,8 +175,12 @@ async def test_tts_connection(request: dict) -> dict[str, object]:
         return {"success": False, "error": str(e)}
 
 
+app.include_router(router)
+
 app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
 
 
 def _clamp_float(value: float, minimum: float, maximum: float) -> float:
     return max(minimum, min(maximum, float(value)))
+
+

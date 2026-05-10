@@ -2,6 +2,8 @@
 from app.jobs import store
 from app.config import settings
 from app.tts import TTSOptions
+import httpx
+from app.tts import IndexTTS2Client
 
 router = APIRouter()
 
@@ -65,3 +67,19 @@ async def create_job(
     )
     job = await store.create_job(original_audio, lrc_file, reference_audio, output_format, tts_options, tts_url)
     return {"id": job.id}
+
+
+@router.get("/tts/health")
+async def tts_health():
+    """检查 IndexTTS2 服务健康状态"""
+    client = IndexTTS2Client()
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as hx:
+            # Gradio 根路径返回 200 即可
+            resp = await hx.get(client.base_url)
+            if resp.status_code == 200:
+                return {"status": "ok", "mode": "queue"}
+            else:
+                return {"status": "unhealthy", "code": resp.status_code}
+    except Exception as e:
+        return {"status": "unreachable", "error": str(e)}

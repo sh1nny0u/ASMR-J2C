@@ -1,10 +1,10 @@
 ﻿# ASMR-J2C
 
-将日语原音频中中文 LRC 字幕标记的说话片段替换为中文 TTS 语音的本地工具。
+将日语（或其他语言）原音频中中文 LRC 字幕标记的说话片段替换为中文 TTS 语音的本地工具。
 
 ## 功能
 
-- 上传日语原音频、中文 LRC 字幕和目标音色参考音频。
+- 上传原音频、中文 LRC 字幕和目标音色参考音频。
 - 按 LRC 时间逐句调用本地 IndexTTS2 生成中文语音。
 - 支持IndexTTS2情绪控制、参数调整。
 - 替换字幕有效时间段内的原声，字幕外的环境声、停顿和背景音保持原样。
@@ -22,47 +22,48 @@
 ## 快速开始
 
 1. 克隆或下载本仓库。
-2. 双击 `start.bat` 启动 Web 服务（首次运行会自动创建虚拟环境并安装依赖）。
-3. 浏览器访问 `http://127.0.0.1:7861`。
-4. 上传音频和字幕，调整 TTS 参数，点击“开始生成”。
+2. 双击 `setup-index.bat` 安装 IndexTTS2 服务（基于官方[IndexTTS2](https://github.com/index-tts/index-tts),首次运行会自动创建虚拟环境安装依赖，并下载所需模型）。
+3. 双击 `setup-j2c.bat` 安装本项目。
+4. 双击 `start.bat` 启动本项目，自动跳出IndexTTS2以及J2C前端页面，后续启动只需点击 `start.bat` 。
 
-> 如需停止服务，双击 `stop.bat` 或按 Ctrl+C。
+> 为确保端口释放，建议点击 `stop.bat` 结束运行本项目。
 
-## 配置 TTS 服务地址
-
-在 Web 界面中展开“IndexTTS2 参数”，可自定义 IndexTTS2 服务地址（例如 `http://127.0.0.1:7861`），地址会自动保存。
 
 ## 项目结构
 
 ```
 ASMR-J2C/
-├── app/               # 后端代码
-│   ├── main.py        # FastAPI 主入口
-│   ├── jobs.py        # 任务队列与处理
-│   ├── tts.py         # IndexTTS2 客户端
-│   ├── lrc.py         # LRC 解析
-│   ├── audio.py       # 音频处理
-│   └── config.py      # 配置
-├── static/            # 前端页面
-│   ├── index.html
-│   ├── app.js
-│   └── styles.css
-├── requirements.txt   # Python 依赖
-├── start.bat          # 启动脚本（Windows）
-├── stop.bat           # 停止脚本（Windows）
-└── README.md
+│
+├── app/                            # FastAPI 后端主程序目录
+│   ├── audio.py                    # 音频处理
+│   ├── config.py                   # 配置管理
+│   ├── jobs.py                     # 任务队列管理与执行
+│   ├── lrc.py                      # LRC 字幕解析和验证
+│   ├── main.py                     # FastAPI 应用入口
+│   ├── routes.py                   # API 路由
+│   ├── tts.py                      # IndexTTS2 客户端封装
+│   └── __init__.py                 # 包标识
+│
+├── indexTTS2/                      # IndexTTS2 语音合成引擎
+│
+├── static/                         # 前端静态资源
+│   ├── app.js                      # 前端业务逻辑（任务提交、状态轮询）
+│   ├── index.html                  # 主界面 HTML
+│   └── styles.css                  # 样式表
+│
+├── setup-index.bat                 # 一键安装 IndexTTS2 环境的批处理
+├── setup-index.ps1                 # IndexTTS2 环境安装脚本
+├── setup-j2c.bat                   # 一键安装 ASMR-J2C 主项目依赖的批处理
+├── setup-j2c.ps1                   # 主项目环境安装脚本
+├── start.bat                       # 启动服务的批处理
+├── start-app.ps1                   # 启动主逻辑
+└── stop.bat                        # 强制停止服务的批处理
 ```
-
-## 环境变量（可选）
-
-- `INDEXTTS2_BASE_URL` – IndexTTS2 服务地址（默认 `http://127.0.0.1:7860`），可在前端页面自行修改地址端口。
-- 其他参数见 `app/config.py`
 
 ## 注意事项
 
-- 请确保 IndexTTS2 服务在启动本工具之前已经运行。
 - 生成任务会占用较多内存和 CPU，建议在有独立显卡的机器上运行。
-- 首次启动时会自动下载 Python 依赖（约 100MB），请耐心等待。
+- 首次启动时会自动下载 Python 依赖、以及IndexTTS2所需模型，请耐心等待。
 
 ## 开源协议
 
