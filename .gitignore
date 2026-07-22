@@ -1,0 +1,27 @@
+# Python
+**pycache**/
+__pycache__/
+*.py[cod]
+*.so
+.Python
+.venv/
+venv/
+env/
+*.log
+data/
+runtime.log
+start.log
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# ASMR-J2C runtime assets
+logs/
+indexTTS2/index-tts/.venv/
+indexTTS2/index-tts/checkpoints/
+indexTTS2/index-tts/outputs/

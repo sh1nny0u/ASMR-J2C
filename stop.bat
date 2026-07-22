@@ -1,0 +1,6 @@
+@echo off
+echo Stopping IndexTTS2 and ASMR-J2C...
+echo Killing processes on ports 7860 and 7861...
+powershell -Command "Get-NetTCPConnection -LocalPort 7860,7861 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue; Write-Host ('Killed process ' + $_.OwningProcess + ' using port ' + $_.LocalPort) }"
+echo Done.
+pause
